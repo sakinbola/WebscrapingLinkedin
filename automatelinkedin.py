@@ -21,6 +21,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import os 
 from dotenv import load_dotenv
+import logging
+from typing import Optional
 
 # [5384:2080:0301/122825.925:ERROR:ssl_client_socket_impl.cc(877)] handshake failed; returned -1, SSL error code 1, net_error -201
 # [5384:2080:0301/122825.948:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
@@ -29,6 +31,19 @@ from dotenv import load_dotenv
 # webdriver managaer automatically downlaods the correct chromedriver elimintatinf need for manual updatesd
 
 # could make a try except function for all webdriver waits incase an element isnt found 
+
+
+def collect_element(driver,by,element):
+    try:
+        element = WebDriverWait(driver, 50).until(
+            EC.presence_of_element_located((by, element))
+        )
+        return element
+    except NoSuchElementException:
+        print(f"Element with {by} '{element}' not found.")
+        return None
+    
+
 def setup():
     options = Options()
     options.add_argument("--disable-webrtc") 
@@ -56,21 +71,21 @@ def login(driver,email,password):
     driver.get("https://www.linkedin.com/jobs/")
 
     assert "LinkedIn" in driver.title
-    # do you ahve right webpage 
-    # login = driver.find_element(By.XPATH,"//*[@id='session_password']")
-    # old way 
 
-    sign_in = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"//*[@id='session_key']")))
+    sign_in = collect_element(driver, By.ID, "session_key")
+    if not sign_in:
+        print("Sign-in element not found. Exiting...")
+        driver.quit()
+        exit()
 
-    # new way 
     sign_in.clear()
     sign_in.send_keys(email)
 
-    login = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"//*[@id='session_password']")))
+    login = collect_element(driver, By.XPATH, "//*[@id='session_password']")
     login.clear()
     login.send_keys(password)
 
-    button = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"//*[@id='main-content']/section[1]/div/div/form/div[2]/button")))
+    button = collect_element(driver, By.XPATH, "//*[@id='main-content']/section[1]/div/div/form/div[2]/button")
     button.click()
     driver.set_window_size(1920, 1080)
 
@@ -78,42 +93,44 @@ def login(driver,email,password):
 def search(driver):
 
 
-    search_bar =  WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[6]/header/div/div/div/div[2]/div[2]/div/div/input[1]")))
+    search_bar = collect_element(driver, By.XPATH, "/html/body/div[6]/header/div/div/div/div[2]/div[2]/div/div/input[1]")
     search_bar.clear()
     job_input = input("What type of job are you looking for: ")
     search_bar.send_keys(job_input)
     search_bar.send_keys(Keys.RETURN)
 
-    live = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[6]/header/div/div/div/div[2]/div[2]/div/div/input[1]")))
+    live = collect_element(driver, By.XPATH, "/html/body/div[6]/header/div/div/div/div[2]/div[2]/div/div/input[1]")
     live_input =  input("Where do you live City , State or ZipCode ex Hamilton, Ontario, Canada is proper formatting: ")
     live.clear()
     live.send_keys(live_input)
     live.send_keys(Keys.RETURN) 
 
 def filters(driver):
-    print("hello")
+    # print("hello")
 
-    all_filters =  WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[6]/div[3]/div[4]/section/div/section/div/div/div/div/div/button")))
+    all_filters = collect_element(driver, By.XPATH, "/html/body/div[6]/div[3]/div[4]/section/div/section/div/div/div/div/div/button")
     all_filters.click()
 
-    reset =  WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"    /html/body/div[4]/div/div/div[3]/div/button[1]/span")))
-    reset.click()
+    # reset = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[3]/div/button[1]/span")
+    # reset.click()
 
+    # time.sleep(2)
 
-    most_recent = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/div[2]/ul/li[2]/fieldset/div/ul/li[1]/label")))
+    
+    most_recent = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/ul/li[2]/fieldset/div/ul/li[1]/label")
     most_recent.click()
 
 
-    twntyfour_hours = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/div[2]/ul/li[3]/fieldset/div/ul/li[4]/label")))
+    twntyfour_hours = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/ul/li[3]/fieldset/div/ul/li[4]/label")
     twntyfour_hours.click()
 
-    entry_level = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/div[2]/ul/li[4]/fieldset/div/ul/li[2]/label")))
+    entry_level = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/ul/li[4]/fieldset/div/ul/li[2]/label")
     entry_level.click()
 
-    internship = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/div[2]/ul/li[4]/fieldset/div/ul/li[1]/label")))
+    internship = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/ul/li[4]/fieldset/div/ul/li[1]/label")
     internship.click()
 
-    apply = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div/div/div[3]/div/button[2]/span")))
+    apply = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[3]/div/button[2]/span")
     apply.click()
 
 def good_stuff(driver):
@@ -125,7 +142,85 @@ def good_stuff(driver):
     # string to change xpath , if hit bottom of page , use a formatted 
     # string
     #     to click hnext page, and so on until theres no next paghe 
-    pass
+    try:
+        #
+        def algo(accum):
+            while accum < 26:
+                # click first job
+                job_button = collect_element(driver, By.XPATH, f"/html/body/div[6]/div[3]/div[4]/div/div/main/div/div[2]/div[1]/div/ul/li[{accum}]/div/div") 
+                job_button.click()
+
+                time.sleep(2)
+                
+                # click easy apply 
+                easy_apply_button = collect_element(driver, By.XPATH, f"/html/body/div[6]/div[3]/div[4]/div/div/main/div/div[2]/div[2]/div/div[2]/div/div[2]/div[1]/div/div[1]/div/div[1]/div/div[5]/div/div/div/button/span")
+                easy_apply_button.click()
+
+                # wait 
+                time.sleep(5)
+
+                # click next button
+                next_button1 = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/div/div[2]/form/footer/div[2]/button/span")
+                next_button1.click()
+
+                # click next2
+
+                next_button2 = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/div/div[2]/form/footer/div[2]/button[2]/span")
+                next_button2.click()
+
+                try:
+                    input("Review Screen and add proper information Press Enter to exit the program...")
+                except KeyboardInterrupt:
+                    print("\nDone")
+                finally:
+                    print("Done")
+                
+                # click review 
+                # could implement ai to fill out the review section 
+
+                review = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/div/div[2]/form/footer/div[2]/button[2]/span")
+                review.click()
+
+                submit_button =  collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/div/div[2]/div/footer/div[3]/button[2]/span")
+                submit_button.click()
+
+                # wait 
+                time.sleep(5)
+                accum+=1
+
+            return 1
+        
+
+        try:
+            page_number = 1
+            while True:
+                if algo(1) == 1:  # does algo
+
+                    # Check if next page exists 
+                    next_page = collect_element(driver, By.XPATH, f"/html/body/div[6]/div[3]/div[4]/div/div/main/div/div[2]/div[1]/div/div[2]/div[2]/ul/li[{page_number}]/button")
+                    if next_page is None:
+                        print("Reached last page. Finishing job applications...")
+                        return  # Exit function cleanly
+                    
+                    next_page.click()
+                    page_number += 1
+                    time.sleep(5)
+                    
+        except Exception as e:
+            print(f"An error occurred during pagination: {e}")
+            return  # Exit function on error
+        
+        
+    except NoSuchElementException:
+        print("No more jobs to apply to.")
+        return 
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    
+    finally:
+        print("Finished processing all available jobs")
+        return  # Exit function after completion
 
 
 # code block that is true deeper explanaiton but not to into it for now 
@@ -157,13 +252,11 @@ if __name__ == "__main__":
         filters(driver)
     # always exectues instead of except which only executes in certain cases 
     finally:
-        var = True
-        while var:
-            choice = input("Type finish to exit: ").strip().lower()
-            if choice == "finish":
-                print("You have exited")
-                var = False
-            else:
-                pass
-
-        driver.quit()
+        # if something pressed program will exit 
+        try:
+            input("Press Enter to exit the program...")
+        except KeyboardInterrupt:
+            print("\nProgram terminated by user.")
+        finally:
+            print("Closing browser...")
+            driver.quit()
