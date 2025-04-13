@@ -119,6 +119,12 @@ def filters(driver):
 def good_stuff(driver):
     # algorithim to mass apply to jobs 
     # will add others later
+    # for my goodstuff algo its going to be right now sometype 
+    # of i choose easy apply , click first job easy apply ,
+    # while loop or for loop , click second one use a formatted 
+    # string to change xpath , if hit bottom of page , use a formatted 
+    # string
+    #     to click hnext page, and so on until theres no next paghe 
     pass
 
 
