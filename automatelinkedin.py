@@ -24,14 +24,18 @@ from dotenv import load_dotenv
 import logging
 from typing import Optional
 
-# [5384:2080:0301/122825.925:ERROR:ssl_client_socket_impl.cc(877)] handshake failed; returned -1, SSL error code 1, net_error -201
-# [5384:2080:0301/122825.948:ERROR:socket_manager.cc(147)] Failed to resolve address for stun.l.google.com., errorcode: -105
-# 2nd one was like 50 of them 
+# DISCLAIMER:
+# This project was created for educational and personal learning purposes only.
+# It is NOT intended for active use on LinkedIn, as automation of job applications
 
-# webdriver managaer automatically downlaods the correct chromedriver elimintatinf need for manual updatesd
 
-# could make a try except function for all webdriver waits incase an element isnt found 
 
+# updates to consider 
+# use os.getenv to get email and password from environment variables
+# clean up code and remove unnecessary comments
+# improve testing and error handling 
+# expand to be used for different filters , multiple accounts , retry if something occurs 
+# ai integration 
 
 def collect_element(driver,by,element):
     try:
@@ -177,7 +181,8 @@ def good_stuff(driver):
                 
                 # click review 
                 # could implement ai to fill out the review section 
-
+                # json file to store info 
+                
                 review = collect_element(driver, By.XPATH, "/html/body/div[4]/div/div/div[2]/div/div[2]/form/footer/div[2]/button[2]/span")
                 review.click()
 
